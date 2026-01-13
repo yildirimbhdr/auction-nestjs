@@ -1,5 +1,29 @@
 version: "3.8"
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile.dev
+    container_name: auction_backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=development
+      - POSTGRES_HOST=postgresql
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=5432
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - auction_network
+    depends_on:
+      - postgresql
+    command: npm run start:dev
+
   postgresql:
     image: postgres:15
     container_name: auction_postgresql
